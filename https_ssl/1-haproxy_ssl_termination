@@ -34,7 +34,6 @@ defaults
         errorfile 503 /etc/haproxy/errors/503.http
         errorfile 504 /etc/haproxy/errors/504.http
 backend web-servers
-        mode http
         balance roundrobin
         option forwardfor
         http-request set-header X-Forwarded-Port %[dst_port]
@@ -42,7 +41,6 @@ backend web-servers
         server 4854-web-01 54.90.242.56:80 check
         server 4854-web-02 52.204.221.173:80 check
 frontend bizima.tech
-        mode http
         bind *:80 
         bind *:443 ssl crt /etc/ssl/www.bizima.tech/www.bizima.tech.pem
         default_backend web-servers
