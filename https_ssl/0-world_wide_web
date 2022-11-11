@@ -1,24 +1,25 @@
 #!/usr/bin/env bash
 # bash script to display and extract for a subdomain and domain
 # acquire record type and ip address of subdomains
-splitter () {
-    TEMP=$(dig "$SUBD" | grep -A1 'ANSWER SECTION:' | tail -1)
-    RE=$(echo "$TEMP" | awk '{ print $4 }')
-    IP=$(echo "$TEMP" | awk '{ print $5 }')
+
+check_ip () {
+	if [ $# -gt 1 ] 
+	then
+		RE=$(dig $SUB.$DOMAIN | grep -A 1 "ANSWER SECTION"| awk '{print $4}')
+		IP=$(dig $SUB.$DOMAIN | grep -A 1 "ANSWER SECTION" | awk '{print $5}') 
+		echo The subdomain "$SUB" is a $RE record and points to $IP
+	else
+		for str in ${collection[@]}
+	       	do
+			RE=$(dig $str.$DOMAIN | grep -A 1 "ANSWER SECTION"| awk '{print $4}')
+                	IP=$(dig $str.$DOMAIN | grep -A 1 "ANSWER SECTION" | awk '{print $5}')
+                	echo The subdomain "$str" is a $RE record and points to $IP
+		done
+	fi
 }
 
-if [ "$#" -eq 2 ]
-then
-    SUBD="$2.$1"
-    splitter "$SUBD"
-    ecgho "The subdomain $2 is a $RE record and points to $IP"
-elif [ "$#" -eq 1 ]
-then
-    ARR=('www' 'lb-01' 'web-01' 'web-02')
-    for i in "${ARR[@]}"
-    do
-        SUBD="$i.$1"
-        splitter "$SUBD"
-        echo "The subdomain $i is a $RE record and points to $IP"
-    done
-fi
+DOMAIN=$1
+SUB=$2
+collection=("www" "lb-01" "web-01" "web-02")
+
+check_ip $1 $2
