@@ -1,22 +1,24 @@
 #!/usr/bin/env bash
 # bash script to display and extract for a subdomain and domain
 # acquire record type and ip address of subdomains
-
-info_domain () {
-    TEMP=$(dig $2.$1 | awk '/ANSWER SECTION:/{getline;print;}')
-    REC=$(echo $TEMP | cut -d' ' -f 4)
-    IP=$(echo $TEMP | cut -d' ' -f 5)
-    echo "Subdomain $2 is a $REC record and points to $IP"
+splitter () {
+    TEMP=$(dig "$SUBD" | grep -A1 'ANSWER SECTION:' | tail -1)
+    RE=$(echo "$TEMP" | awk '{ print $4 }')
+    IP=$(echo "$TEMP" | awk '{ print $5 }')
 }
-if [ "$#" -lt 1 ]
+
+if [ "$#" -eq 2 ]
 then
-    echo "Usage: 0-world_wide_web DOMAIN SUBDOMAIN(optional)"
+    SUBD="$2.$1"
+    splitter "$SUBD"
+    ecgho "The subdomain $2 is a $RE record and points to $IP"
 elif [ "$#" -eq 1 ]
 then
-    info_domain "$1" "www"
-    info_domain "$1" "lb-01"
-    info_domain "$1" "web-01"
-    info_domain "$1" "web-02"
-else
-    info_domain "$1" "$2"
+    ARR=('www' 'lb-01' 'web-01' 'web-02')
+    for i in "${ARR[@]}"
+    do
+        SUBD="$i.$1"
+        splitter "$SUBD"
+        echo "The subdomain $i is a $RE record and points to $IP"
+    done
 fi
