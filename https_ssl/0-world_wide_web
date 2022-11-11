@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# extract and deisplay info for subdomain
+# get ip address and record type for subdomains
+
+# record type as A and ip address as B
+info_Domain () {
+    TEMP=$(dig $2.$1 | awk '/ANSWER SECTION:/{getline;print;}')
+    A=$(echo $TEMP | cut -d' ' -f 4)
+    B=$(echo $TEMP | cut -d' ' -f 5)
+    echo "The subdomain $2 is a $A record and points to $B"
+}
+if [ $# -lt 1 ]
+then
+    echo "Usage: 0-world_wide_web DOMAIN SUBDOMAIN(optional)"
+elif [ $# -eq 1 ]
+then
+    info_Domain "$1" "www"
+    info_Domain "$1" "lb-01"
+    info_Domain "$1" "web-01"
+    info_Domain "$1" "web-02"
+else
+    info_Domain "$1" "$2"
+fi
