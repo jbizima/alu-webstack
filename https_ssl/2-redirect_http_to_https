@@ -1,5 +1,4 @@
 global
-        ssl-server-verify none
         log /dev/log    local0
         log /dev/log    local1 notice
         chroot /var/lib/haproxy
@@ -33,15 +32,15 @@ defaults
         errorfile 502 /etc/haproxy/errors/502.http
         errorfile 503 /etc/haproxy/errors/503.http
         errorfile 504 /etc/haproxy/errors/504.http
-backend web-servers
-        mode http
-        balance roundrobin
-        option forwardfor
-        server 4854-web-01 54.90.242.56:80 check
-        server 4854-web-02 52.204.221.173:80 check
-frontend bizima.tech
-        mode http
+
+frontend Local_Server
         bind *:80
         bind *:443 ssl crt /etc/ssl/certs/www.bizima.tech.pem
-        ttp-request redirect scheme https unless { ssl_fc }
-        default_backend web-servers
+        mode http
+        http-request redirect scheme https unless { ssl_fc }
+        default_backend Web_Servers
+backend Web_Servers
+        balance roundrobin
+        mode http
+        server web-01 54.90.242.56:80 check
+        server web-02 52.204.221.173:80 check
