@@ -32,14 +32,14 @@ defaults
         errorfile 502 /etc/haproxy/errors/502.http
         errorfile 503 /etc/haproxy/errors/503.http
         errorfile 504 /etc/haproxy/errors/504.http
-backend web-servers
-        balance roundrobin
-        option forwardfor
-        http-request set-header X-Forwarded-Port %[dst_port]
-        http-request add-header X-Forwarded-Proto https if { ssl_fc }
-        server 4854-web-01 54.90.242.56:80 check
-        server 4854-web-02 52.204.221.173:80 check
-frontend http
+
+frontend Local_Server
         bind *:80
-        bind *:443 ssl crt /etc/ssl/www.bizima.tech/www.bizima.tech.pem
-        default_backend web-servers
+        bind *:443 ssl crt /etc/ssl/certs/www.bizima.tech.pem
+        mode http
+        default_backend Web_Servers
+backend Web_Servers
+        balance roundrobin
+        mode http
+        server web-01 54.90.242.56:80 check
+        server web-02 52.204.221.173:80 check
